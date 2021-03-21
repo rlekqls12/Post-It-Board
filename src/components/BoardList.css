@@ -1,0 +1,18 @@
+.board-list {
+  width: 200px;
+  height: 100vh;
+  overflow-x: hidden;
+  background-color: grey;
+}
+
+.board-list-wrap {
+  margin: 0;
+  padding: 10px 30px;
+  padding-bottom: 0;
+}
+
+.board-item-adder {
+  text-align: center;
+  font-size: 20px;
+  cursor: pointer;
+}
