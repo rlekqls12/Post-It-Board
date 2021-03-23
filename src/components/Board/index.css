@@ -14,9 +14,10 @@ input {
   position: absolute;
   width: 50vw;
   margin: 0;
-  padding: 10px;
+  padding: 15px;
   font-family: sans-serif;
   font-size: 16px;
+  color: #60aa60;
   border: none;
   z-index: 1;
 }
@@ -24,20 +25,10 @@ input {
 .board-name-text {
   position: absolute;
   margin: 0;
-  padding: 10px;
+  padding: 15px;
   font-family: sans-serif;
   font-size: 16px;
+  white-space: nowrap;
   cursor: pointer;
   z-index: 1;
-}
-
-.board-area {
-  position: relative;
-}
-
-.board-area,
-.board-back-area {
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
 }

@@ -1,24 +1,20 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { Formik, Form, Field } from "formik";
-import { board, modify as modifyName } from "../redux/modules/manageBoardStore";
-import "./Board.css";
+import { getFocusedBoardData } from "./reselect";
+import { modify as modifyName } from "../../redux/modules/manageBoardStore";
+import PostItList from "../PostItList";
+import "./index.css";
 
 function Board() {
   /* ---- Variables ---- */
 
   const dispatch = useDispatch();
 
-  const [focusedBoardID]: string[] = useSelector(
-    (_state: any) => [_state.focusBoardStore],
+  const [focusedBoardID, focusedBoardName]: [string, string] = useSelector(
+    getFocusedBoardData,
     shallowEqual
   );
-  const focusedBoard: board | undefined = useSelector((_state: any) => {
-    const { manageBoardStore: _boardList } = _state;
-
-    return _boardList.find((_board: board) => _board.id === focusedBoardID);
-  }, shallowEqual);
-  const focusedBoardName = focusedBoard?.name ?? "";
 
   const refboardNameInput = useRef<any>();
   const [isBoardNameModify, setBoardNameModifyState] = useState<boolean>(false);
@@ -77,9 +73,7 @@ function Board() {
       >
         {focusedBoardName}
       </p>
-      <div className={"board-area"}>
-        <div className={"board-back-area"} />
-      </div>
+      <PostItList />
     </div>
   );
 }

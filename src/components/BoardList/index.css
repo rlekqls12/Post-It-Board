@@ -25,6 +25,10 @@
   text-overflow: ellipsis;
 }
 
+.board-item:hover {
+  background-color: #6e6e6e;
+}
+
 .board-item.active {
   color: white;
   background-color: black;
