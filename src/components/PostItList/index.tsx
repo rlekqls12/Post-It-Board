@@ -1,14 +1,13 @@
 import React, { useRef } from "react";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
-import { getPostItList } from "./reselect";
-import { postIt, create } from "../../redux/modules/managePostItStore";
+import { getPostItIDList } from "./reselect";
+import { create } from "../../redux/modules/managePostItStore";
 import { changeFocus } from "../../redux/modules/focusPostItStore";
 import PostIt from "../PostIt";
 import "./index.css";
 
 export type postItData = {
   id: string;
-  data: postIt;
   maxZIndex: number;
 };
 
@@ -18,7 +17,7 @@ function PostItList() {
   const dispatch = useDispatch();
 
   const [focusedBoardID, postItList]: [string, postItData[]] = useSelector(
-    getPostItList,
+    getPostItIDList,
     shallowEqual
   );
 
@@ -40,7 +39,7 @@ function PostItList() {
   /* ---- Functions ---- */
 
   const postItElementList = postItList.map((data: postItData) => (
-    <PostIt key={data.id} data={data.data} maxZIndex={data.maxZIndex} />
+    <PostIt key={data.id} id={data.id} maxZIndex={data.maxZIndex} />
   ));
 
   return (

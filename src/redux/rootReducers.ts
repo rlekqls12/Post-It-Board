@@ -8,7 +8,7 @@ const rootReducer = combineReducers({
   manageBoardStore,
   focusBoardStore,
   managePostItStore,
-  focusPostItStore
+  focusPostItStore,
 });
 
 export default rootReducer;

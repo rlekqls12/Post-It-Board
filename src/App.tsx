@@ -8,12 +8,10 @@ import { create } from "./redux/modules/managePostItStore";
 
 // MEMO: https://www.notion.so/afc136a0028b4dc098074d2ca76dfe1f
 
-// MEMO: 포스트잇 Formik으로 재구성하기
-
 // DONE: 1. 포스트잇 생성
 // DONE: 2. 포스트잇 수정
 // DONE: 3. 포스트잇 최소화, 닫기
-// TODO: 4. 포스트잇 드래그
+// DONE: 4. 포스트잇 드래그
 // TODO: 5. 포스트잇 리사이즈
 
 const keys: any = {};

@@ -1,7 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { Form, Formik, Field } from "formik";
-import { reselectProps, reselectIsFocused } from "./reselect";
+import {
+  reselectProps,
+  reselectIsFocused,
+  reselectPostItData,
+} from "./reselect";
 import {
   postIt,
   modify,
@@ -13,7 +17,7 @@ import { changeFocus } from "../../redux/modules/focusPostItStore";
 import "./index.css";
 
 export type Props = {
-  data: postIt;
+  id: string;
   maxZIndex: number;
 };
 
@@ -22,10 +26,22 @@ const FocusType = {
   BODY: "BODY",
 };
 
+const initPostItData = {
+  id: "",
+  title: "",
+  body: "",
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0,
+  open: false,
+  zIndex: 0,
+};
+
 function PostIt(props: Props) {
   /* ---- Variables ---- */
 
-  const { data: postIt, maxZIndex } = reselectProps(props);
+  const { id, maxZIndex } = reselectProps(props);
 
   const dispatch = useDispatch();
 
@@ -33,8 +49,13 @@ function PostIt(props: Props) {
     (state: any) => state.focusBoardStore,
     shallowEqual
   );
+  const postIt: postIt = useSelector(
+    (state: any) =>
+      reselectPostItData(state, focusedBoardID, id) ?? initPostItData,
+    shallowEqual
+  );
   const isFocused = useSelector(
-    (state: any) => reselectIsFocused(state, postIt.id),
+    (state: any) => reselectIsFocused(state, id),
     shallowEqual
   );
 
@@ -52,7 +73,7 @@ function PostIt(props: Props) {
   function getFocus(type: string) {
     if (isFocused) return;
     setFocusElement(type);
-    dispatch(changeFocus(postIt.id));
+    dispatch(changeFocus(id));
     updateZIndex();
   }
 
@@ -65,29 +86,25 @@ function PostIt(props: Props) {
   function onSubmit(data: any) {
     const { tempPostItTitle, tempPostItBody } = data;
     if (tempPostItTitle !== postIt.title || tempPostItBody !== postIt.body) {
-      dispatch(
-        modify(focusedBoardID, postIt.id, tempPostItTitle, tempPostItBody)
-      );
+      dispatch(modify(focusedBoardID, id, tempPostItTitle, tempPostItBody));
     }
     lossFocus();
   }
 
   function togglePostIt() {
     updateZIndex();
-    dispatch(toggle(focusedBoardID, postIt.id, !postIt.open));
+    dispatch(toggle(focusedBoardID, id, !postIt.open));
   }
 
   function updateZIndex() {
-    dispatch(
-      modify(focusedBoardID, postIt.id, undefined, undefined, maxZIndex + 1)
-    );
+    dispatch(modify(focusedBoardID, id, undefined, undefined, maxZIndex + 1));
   }
 
   function removePostIt() {
     let isDelete = true;
     if (postIt.body.length > 0)
       isDelete = globalThis.confirm("정말로 삭제하시겠습니까?");
-    if (isDelete) dispatch(remove(focusedBoardID, postIt.id));
+    if (isDelete) dispatch(remove(focusedBoardID, id));
   }
 
   function postItDragStart(e: React.DragEvent<HTMLDivElement>) {
@@ -108,12 +125,7 @@ function PostIt(props: Props) {
     if (!dragState) return;
 
     dispatch(
-      move(
-        focusedBoardID,
-        postIt.id,
-        postIt.x + adderXY[0],
-        postIt.y + adderXY[1]
-      )
+      move(focusedBoardID, id, postIt.x + adderXY[0], postIt.y + adderXY[1])
     );
     setAdderXY([0, 0]);
     setDragState(false);

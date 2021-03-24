@@ -2,7 +2,7 @@ import { createSelector } from "reselect";
 import { postIt } from '../../redux/modules/managePostItStore';
 import { postItData } from './index';
 
-const reselectPostItList = createSelector(
+const reselectPostItIDList = createSelector(
   (state: any) => state.focusBoardStore,
   (state: any) => state.managePostItStore,
   (focusedBoardID: string, postItBoardList: { [key: string]: postIt[] }): [string, postItData[]] => {
@@ -17,7 +17,6 @@ const reselectPostItList = createSelector(
     const postItDataList = postItList.map(
       (postIt: postIt): postItData => ({
         id: postIt.id,
-        data: postIt,
         maxZIndex: maxZIndex,
       })
     );
@@ -26,4 +25,4 @@ const reselectPostItList = createSelector(
   }
 );
 
-export const getPostItList = (state: any): [string, postItData[]] => reselectPostItList(state);
+export const getPostItIDList = (state: any): [string, postItData[]] => reselectPostItIDList(state);

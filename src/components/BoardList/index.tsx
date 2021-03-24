@@ -1,4 +1,4 @@
-import { useSelector, useDispatch, shallowEqual } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { board, create } from "../../redux/modules/manageBoardStore";
 import { changeFocus } from "../../redux/modules/focusBoardStore";
 import "./index.css";
@@ -15,30 +15,44 @@ function BoardList() {
 
   const dispatch = useDispatch();
 
-  const boardList: boardData[] = useSelector((state: any) => {
-    const {
-      focusBoardStore: focusedBoardID,
-      manageBoardStore: boardList,
-    } = state;
+  const boardList: boardData[] = useSelector(
+    (state: any) => {
+      const {
+        focusBoardStore: focusedBoardID,
+        manageBoardStore: boardList,
+      } = state;
 
-    if (!focusedBoardID && boardList[0]?.id)
-      dispatch(changeFocus(boardList[0].id));
+      if (!focusedBoardID && boardList[0]?.id)
+        dispatch(changeFocus(boardList[0].id));
 
-    return boardList.map(
-      (board: board): boardData => {
-        const getFocus = () => {
-          if (focusedBoardID !== board.id) dispatch(changeFocus(board.id));
-        };
+      return boardList.map(
+        (board: board): boardData => {
+          const getFocus = () => {
+            if (focusedBoardID !== board.id) dispatch(changeFocus(board.id));
+          };
 
-        return {
-          id: board.id,
-          name: board.name,
-          active: board.id === focusedBoardID,
-          onClick: getFocus,
-        };
-      }
-    );
-  }, shallowEqual);
+          return {
+            id: board.id,
+            name: board.name,
+            active: board.id === focusedBoardID,
+            onClick: getFocus,
+          };
+        }
+      );
+    },
+    (left, right) => {
+      if (left.length !== right.length) return false;
+      const leftIDs = left
+        .map((data: boardData) => `${data.id}${data.name}${data.active}`)
+        .sort()
+        .join("");
+      const rightIDs = right
+        .map((data: boardData) => `${data.id}${data.name}${data.active}`)
+        .sort()
+        .join("");
+      return leftIDs === rightIDs;
+    }
+  );
 
   /* ---- Variables ---- */
   /* ---- Functions ---- */
