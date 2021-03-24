@@ -22,9 +22,9 @@ function Board() {
   /* ---- Variables ---- */
   /* ---- Functions ---- */
 
-  function modifyBoardName(_boardName: string) {
-    if (_boardName?.trim()?.length > 0) {
-      const name = _boardName.replace(/\s/g, "\u00A0");
+  function modifyBoardName(boardName: string) {
+    if (boardName?.trim()?.length > 0) {
+      const name = boardName.replace(/\s/g, "\u00A0");
 
       if (focusedBoardName !== name) {
         dispatch(modifyName(name, focusedBoardID));
@@ -44,6 +44,9 @@ function Board() {
 
   /* ---- Events ---- */
 
+  const nameInputVisible = isBoardNameModify ? "d-block" : "d-none";
+  const nameTextVisible = isBoardNameModify ? "d-none" : "d-block";
+
   return (
     <div className={"board"}>
       <Formik
@@ -51,24 +54,22 @@ function Board() {
         initialValues={{
           tempBoardName: focusedBoardName,
         }}
-        onSubmit={(_data) => modifyBoardName(_data.tempBoardName)}
+        onSubmit={(data) => modifyBoardName(data.tempBoardName)}
       >
         {({ handleSubmit }) => (
           <Form>
             <Field
               name={"tempBoardName"}
               innerRef={refboardNameInput}
-              className={"board-name-input"}
+              className={"board-name-input " + nameInputVisible}
               maxLength={32}
-              style={{ display: isBoardNameModify ? "block" : "none" }}
               onBlur={handleSubmit}
             />
           </Form>
         )}
       </Formik>
       <p
-        className={"board-name-text"}
-        style={{ display: isBoardNameModify ? "none" : "block" }}
+        className={"board-name-text " + nameTextVisible}
         onClick={() => focusedBoardID && setBoardNameModifyState(true)}
       >
         {focusedBoardName}

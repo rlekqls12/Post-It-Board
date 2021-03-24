@@ -1,29 +1,26 @@
 import React, { useRef } from "react";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
-import { reselectPostItList } from "./reselect";
+import { getPostItList } from "./reselect";
 import { postIt, create } from "../../redux/modules/managePostItStore";
 import { changeFocus } from "../../redux/modules/focusPostItStore";
 import PostIt from "../PostIt";
 import "./index.css";
+
+export type postItData = {
+  id: string;
+  data: postIt;
+  maxZIndex: number;
+};
 
 function PostItList() {
   /* ---- Variables ---- */
 
   const dispatch = useDispatch();
 
-  const [focusedBoardID, postItElementList]: [
-    string,
-    JSX.Element[]
-  ] = useSelector((state: any) => {
-    const [focusedBoardID, postItList, maxZIndex] = reselectPostItList(state);
-    if (!focusedBoardID) return [focusedBoardID, []];
-
-    const postItElementList = postItList.map((_postIt: postIt) => (
-      <PostIt key={_postIt.id} data={_postIt} maxZIndex={maxZIndex} />
-    ));
-
-    return [focusedBoardID, postItElementList];
-  }, shallowEqual);
+  const [focusedBoardID, postItList]: [string, postItData[]] = useSelector(
+    getPostItList,
+    shallowEqual
+  );
 
   const refBoardAreaDiv = useRef<HTMLDivElement>(null);
 
@@ -34,13 +31,17 @@ function PostItList() {
     if (!focusedBoardID) return;
 
     const { pageX: x, pageY: y } = e;
-    const leftPadding = refBoardAreaDiv?.current?.offsetLeft ?? 0;
+    const leftMargin = refBoardAreaDiv?.current?.offsetLeft ?? 0;
 
-    const createdPostIt = dispatch(create(focusedBoardID, x - leftPadding, y));
+    const createdPostIt = dispatch(create(focusedBoardID, x - leftMargin, y));
     dispatch(changeFocus(createdPostIt.id));
   }
 
   /* ---- Functions ---- */
+
+  const postItElementList = postItList.map((data: postItData) => (
+    <PostIt key={data.id} data={data.data} maxZIndex={data.maxZIndex} />
+  ));
 
   return (
     <div ref={refBoardAreaDiv} className={"board-area"}>

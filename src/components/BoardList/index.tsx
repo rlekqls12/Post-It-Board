@@ -3,12 +3,19 @@ import { board, create } from "../../redux/modules/manageBoardStore";
 import { changeFocus } from "../../redux/modules/focusBoardStore";
 import "./index.css";
 
+type boardData = {
+  id: string;
+  name: string;
+  active: boolean;
+  onClick: () => void;
+};
+
 function BoardList() {
   /* ---- Variables ---- */
 
   const dispatch = useDispatch();
 
-  const boardElementList: JSX.Element[] = useSelector((state: any) => {
+  const boardList: boardData[] = useSelector((state: any) => {
     const {
       focusBoardStore: focusedBoardID,
       manageBoardStore: boardList,
@@ -17,22 +24,20 @@ function BoardList() {
     if (!focusedBoardID && boardList[0]?.id)
       dispatch(changeFocus(boardList[0].id));
 
-    return boardList.map((board: board) => {
-      const isBoardActive = board.id === focusedBoardID ? " active" : "";
-      const getFocus = () => {
-        if (focusedBoardID !== board.id) dispatch(changeFocus(board.id));
-      };
+    return boardList.map(
+      (board: board): boardData => {
+        const getFocus = () => {
+          if (focusedBoardID !== board.id) dispatch(changeFocus(board.id));
+        };
 
-      return (
-        <li
-          key={board.id}
-          className={"board-item" + isBoardActive}
-          onClick={getFocus}
-        >
-          <div>{board.name}</div>
-        </li>
-      );
-    });
+        return {
+          id: board.id,
+          name: board.name,
+          active: board.id === focusedBoardID,
+          onClick: getFocus,
+        };
+      }
+    );
   }, shallowEqual);
 
   /* ---- Variables ---- */
@@ -43,6 +48,16 @@ function BoardList() {
   }
 
   /* ---- Functions ---- */
+
+  const boardElementList = boardList.map((data: boardData) => (
+    <li
+      key={data.id}
+      className={"board-item" + (data.active ? " active" : "")}
+      onClick={data.onClick}
+    >
+      <div>{data.name}</div>
+    </li>
+  ));
 
   return (
     <div className={"board-list"}>
