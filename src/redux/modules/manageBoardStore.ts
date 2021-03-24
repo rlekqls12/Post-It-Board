@@ -24,10 +24,10 @@ export const initialized = () => ({
   type: ACTIONS.INIT,
 });
 
-export const create = (name: string, id?: string) => ({
+export const create = (id?: string) => ({
   type: ACTIONS.CREATE,
   id: id ?? v4(),
-  name: name,
+  name: "New\u00A0Board",
 });
 
 export const modify = (name: string, id: string) => ({

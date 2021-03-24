@@ -2,7 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { Form, Formik, Field } from "formik";
 import { reselectProps, reselectIsFocused } from "./reselect";
-import { postIt, modify } from "../../redux/modules/managePostItStore";
+import {
+  postIt,
+  modify,
+  toggle,
+  remove,
+} from "../../redux/modules/managePostItStore";
 import { changeFocus } from "../../redux/modules/focusPostItStore";
 import "./index.css";
 
@@ -19,7 +24,7 @@ const FocusType = {
 function PostIt(props: Props) {
   /* ---- Variables ---- */
 
-  const { data: postIt } = reselectProps(props);
+  const { data: postIt, maxZIndex } = reselectProps(props);
 
   const dispatch = useDispatch();
 
@@ -43,6 +48,7 @@ function PostIt(props: Props) {
     if (isFocused) return;
     setFocusElement(type);
     dispatch(changeFocus(postIt.id));
+    updateZIndex();
   }
 
   function lossFocus() {
@@ -61,17 +67,32 @@ function PostIt(props: Props) {
     lossFocus();
   }
 
+  function togglePostIt() {
+    updateZIndex();
+    dispatch(toggle(focusedBoardID, postIt.id, !postIt.open));
+  }
+
+  function updateZIndex() {
+    dispatch(
+      modify(focusedBoardID, postIt.id, undefined, undefined, maxZIndex + 1)
+    );
+  }
+
+  function removePostIt() {
+    let isDelete = true;
+    if (postIt.body.length > 0)
+      isDelete = globalThis.confirm("정말로 삭제하시겠습니까?");
+    if (isDelete) dispatch(remove(focusedBoardID, postIt.id));
+  }
+
   /* ---- Functions ---- */
   /* ---- Events ---- */
 
   useEffect(() => {
-    if (!focusElement) return;
-
     let current: any;
-    if (focusElement === FocusType.TITLE)
-      current = refPostItTitleInput?.current;
-    else if (focusElement === FocusType.BODY)
-      current = refPostItNameInput?.current;
+
+    if (focusElement === FocusType.BODY) current = refPostItNameInput?.current;
+    else current = refPostItTitleInput?.current;
 
     if (current) current.focus();
   }, [focusElement]);
@@ -81,6 +102,8 @@ function PostIt(props: Props) {
   const headFocus = isFocused ? " post-it-focus" : "";
   const modifyVisible = isFocused ? "d-inline-block" : "d-none";
   const textVisible = isFocused ? "d-none" : "d-inline-block";
+  const minializedPostIt = postIt.open ? `${postIt.height}px` : "auto";
+  const minializedBody = postIt.open ? "" : "minimalized";
 
   return (
     <div
@@ -89,7 +112,7 @@ function PostIt(props: Props) {
         left: `${postIt.x}px`,
         top: `${postIt.y}px`,
         width: `${postIt.width}px`,
-        height: `${postIt.height}px`,
+        height: minializedPostIt,
         zIndex: postIt.zIndex,
       }}
     >
@@ -117,12 +140,16 @@ function PostIt(props: Props) {
                 {postIt.title}
               </div>
               <div className={"post-it-control"}>
-                <div className={"post-it-control-item"}>-</div>
-                <div className={"post-it-control-item"}>X</div>
+                <div className={"post-it-control-item"} onClick={togglePostIt}>
+                  -
+                </div>
+                <div className={"post-it-control-item"} onClick={removePostIt}>
+                  X
+                </div>
               </div>
             </div>
             <div
-              className={"post-it-body"}
+              className={"post-it-body " + minializedBody}
               onClick={() => getFocus(FocusType.BODY)}
             >
               <Field

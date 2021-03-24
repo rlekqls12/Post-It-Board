@@ -51,11 +51,8 @@ export const create = (board: string, x: number, y: number, id?: string) => ({
   type: ACTIONS.CREATE,
   board: board,
   id: id ?? v4(),
-  title: 'New\u00A0PostIt',
-  body: '',
   x: x,
   y: y,
-  open: true
 });
 
 export const modify = (board: string, id: string, title?: string, body?: string, zIndex?: number) => ({
@@ -126,16 +123,20 @@ const managePostItStore = (state = init, action: action) => {
   }
 
   if (type === ACTIONS.CREATE) {
+    const maxZIndex = state[board].reduce((max, v, i) => {
+      return max < v.zIndex ? v.zIndex : max;
+    }, 0);
+
     state[board].push({
       id: id ?? v4(),
-      title: title ?? '',
-      body: body ?? '',
+      title: 'New\u00A0PostIt',
+      body: '',
       x: x ?? 0,
       y: y ?? 0,
       width: 320,
       height: 240,
-      open: open ?? true,
-      zIndex: 0
+      open: true,
+      zIndex: maxZIndex
     });
     saveLocalStorage(state);
 

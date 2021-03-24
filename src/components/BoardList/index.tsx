@@ -44,7 +44,7 @@ function BoardList() {
   /* ---- Functions ---- */
 
   function createBoard() {
-    dispatch(create("New\u00A0Board"));
+    dispatch(create());
   }
 
   /* ---- Functions ---- */

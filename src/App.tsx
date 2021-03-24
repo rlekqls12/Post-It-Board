@@ -12,7 +12,7 @@ import { create } from "./redux/modules/managePostItStore";
 
 // DONE: 1. 포스트잇 생성
 // DONE: 2. 포스트잇 수정
-// TODO: 3. 포스트잇 최소화, 닫기
+// DONE: 3. 포스트잇 최소화, 닫기
 // TODO: 4. 포스트잇 드래그
 // TODO: 5. 포스트잇 리사이즈
 
@@ -24,11 +24,13 @@ function App() {
     (state: any) => state.focusBoardStore
   );
 
+  // Load LocalStorage
   useEffect(() => {
     dispatch(initBoardList());
     dispatch(initPostItList());
   }, [dispatch]);
 
+  // New PostIt Control + Alt + N
   useEffect(() => {
     function onKeyUp(e: KeyboardEvent) {
       if (!e) return;
@@ -37,7 +39,7 @@ function App() {
     }
 
     function onKeyDown(e: KeyboardEvent) {
-      if (!e) return;
+      if (!e || !focusedBoardID) return;
       keys[e.key.toLowerCase()] = true;
       keys[e.keyCode] = true;
 
