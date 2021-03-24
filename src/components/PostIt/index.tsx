@@ -5,6 +5,7 @@ import { reselectProps, reselectIsFocused } from "./reselect";
 import {
   postIt,
   modify,
+  move,
   toggle,
   remove,
 } from "../../redux/modules/managePostItStore";
@@ -40,6 +41,10 @@ function PostIt(props: Props) {
   const refPostItTitleInput = useRef<any>();
   const refPostItNameInput = useRef<any>();
   const [focusElement, setFocusElement] = useState<string>("");
+
+  const [dragState, setDragState] = useState<boolean>(false);
+  const [adderXY, setAdderXY] = useState<number[]>([0, 0]);
+  const [startXY, setStartXY] = useState<number[]>([0, 0]);
 
   /* ---- Variables ---- */
   /* ---- Functions ---- */
@@ -85,6 +90,35 @@ function PostIt(props: Props) {
     if (isDelete) dispatch(remove(focusedBoardID, postIt.id));
   }
 
+  function postItDragStart(e: React.DragEvent<HTMLDivElement>) {
+    const { pageX, pageY } = e;
+    updateZIndex();
+    setStartXY([pageX, pageY]);
+    setDragState(true);
+  }
+
+  function postItDragOver(e: React.DragEvent<HTMLDivElement>) {
+    if (!dragState) return;
+
+    const { pageX, pageY } = e;
+    setAdderXY([pageX - startXY[0], pageY - startXY[1]]);
+  }
+
+  function postItDragEnd(e: React.DragEvent<HTMLDivElement>) {
+    if (!dragState) return;
+
+    dispatch(
+      move(
+        focusedBoardID,
+        postIt.id,
+        postIt.x + adderXY[0],
+        postIt.y + adderXY[1]
+      )
+    );
+    setAdderXY([0, 0]);
+    setDragState(false);
+  }
+
   /* ---- Functions ---- */
   /* ---- Events ---- */
 
@@ -109,8 +143,8 @@ function PostIt(props: Props) {
     <div
       className={"post-it"}
       style={{
-        left: `${postIt.x}px`,
-        top: `${postIt.y}px`,
+        left: `${postIt.x + adderXY[0]}px`,
+        top: `${postIt.y + adderXY[1]}px`,
         width: `${postIt.width}px`,
         height: minializedPostIt,
         zIndex: postIt.zIndex,
@@ -126,7 +160,13 @@ function PostIt(props: Props) {
       >
         {({ handleSubmit }) => (
           <Form className={"post-it-form"} onBlur={handleSubmit}>
-            <div className={"post-it-head " + headFocus}>
+            <div
+              draggable
+              className={"post-it-head " + headFocus}
+              onDragStart={postItDragStart}
+              onDragOver={postItDragOver}
+              onDragEnd={postItDragEnd}
+            >
               <Field
                 name={"tempPostItTitle"}
                 innerRef={refPostItTitleInput}
